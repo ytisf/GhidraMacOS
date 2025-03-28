@@ -5,6 +5,8 @@ __pycache__/
 
 # C extensions
 *.so
+.DS_Store
+.idea/
 
 # Distribution / packaging
 .Python
@@ -107,6 +109,9 @@ __pypackages__/
 # Celery stuff
 celerybeat-schedule
 celerybeat.pid
+
+ghidra_install/*
+ghidra_install
 
 # SageMath parsed files
 *.sage.py
