@@ -2,6 +2,8 @@
 
 This script automates the process of installing Ghidra as a self-contained OSX `.app` without contaminating your system with a separate Java installation. It is specifically designed for ARM64 architecture, making it suitable for Apple's M1, M2, M3, and other ARM-based Macs.
 
+*notice the script will NOT copy Ghidra to your Applications directory if you run it from the command line. You can either run it from the terminal or copy the script to your Applications directory and run it from there.* 
+
 ## Requirements
 
 - macOS running on ARM64 architecture (M1, M2, M3, etc.).

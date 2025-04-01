@@ -110,8 +110,11 @@ __pypackages__/
 celerybeat-schedule
 celerybeat.pid
 
-ghidra_install/*
-ghidra_install
+ghidra_install/ghidra
+ghidra_install/Ghidra.app
+ghidra_install/jdk
+ghidra_install/ghidra.zip
+ghidra_install/openjdk.tar.gz
 
 # SageMath parsed files
 *.sage.py

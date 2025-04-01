@@ -10,44 +10,55 @@ from tqdm import tqdm
 # Initialize colorama
 init(autoreset=True)
 
-
 def print_banner():
     banner = f"""
 {Fore.MAGENTA}
-  _____                _____ _      
- / ____|              / ____| |     
-| (___  _ __ ___  ___| (___ | | ___ 
+  _____                _____ _
+ / ____|              / ____| |
+| (___  _ __ ___  ___| (___ | | ___
  \\___ \\| '__/ _ \\/ _ \\\\___ \\| |/ _ \\
  ____) | | |  __/  __/____) | |  __/
 |_____/|_|  \\___|\\___|_____/|_|\\___|
 
 {Fore.CYAN}
-    .-.     .-.     .-.     .-.     .-.     .-.     .-.     .-.     .-. 
+    .-.     .-.     .-.     .-.     .-.     .-.     .-.     .-.     .-.
    (_  )   (_  )   (_  )   (_  )   (_  )   (_  )   (_  )   (_  )   (_  )
-     /       /       /       /       /       /       /       /       / 
-    (       (       (       (       (       (       (       (       (  
-     `-'     `-'     `-'     `-'     `-'     `-'     `-'     `-'     `-' 
+     /       /       /       /       /       /       /       /       /
+    (       (       (       (       (       (       (       (       (
+     `-'     `-'     `-'     `-'     `-'     `-'     `-'     `-'     `-'
 {Style.RESET_ALL}
 """
     print(banner)
 
-
 # URLs
-applet_url = "https://gist.github.com/yifanlu/e9965cdb148b550335e57899f790cad2/raw/043f7ac03d322f369ed122aa93230dac2af0d66e/Ghidra-OSX-Launcher-Script.scpt"
 java_url = "https://download.java.net/java/GA/jdk22.0.1/c7ec1332f7bb44aeba2eb341ae18aca4/8/GPL/openjdk-22.0.1_macos-aarch64_bin.tar.gz"
 ghidra_url = "https://github.com/NationalSecurityAgency/ghidra/releases/download/Ghidra_11.0.3_build/ghidra_11.0.3_PUBLIC_20240410.zip"
 
 # Paths
 cwd = os.getcwd()
 temp_dir = os.path.join(cwd, "ghidra_install")
+applet_path = os.path.join(temp_dir, "Ghidra-OSX-Launcher-Script.scpt")
 app_dir = os.path.join(temp_dir, "Ghidra.app")
 jdk_dir = os.path.join(temp_dir, "jdk")
 ghidra_dir = os.path.join(temp_dir, "ghidra")
 applications_dir = "/Applications"
 
+# Names
+launch_script_path = os.path.join(temp_dir,'Ghidra.app/Contents/Resources/ghidra/support/launch.sh')
+ghidra_run_path = os.path.join(temp_dir, 'Ghidra.app/Contents/Resources/ghidra/ghidraRun')
+
+
 # Create temporary directory
 os.makedirs(temp_dir, exist_ok=True)
 
+
+def add_execute_permissions(file_path):
+    try:
+        subprocess.run(["chmod", "+x", file_path], check=True)
+        print(f"{Fore.GREEN}Added execute permissions to {file_path}{Style.RESET_ALL}")
+    except subprocess.CalledProcessError as e:
+        print(f"{Fore.RED}Error adding execute permissions to {file_path}: {e}{Style.RESET_ALL}")
+        raise
 
 def download_file(url, dest):
     if os.path.exists(dest):
@@ -66,7 +77,6 @@ def download_file(url, dest):
         print(f"{Fore.RED}Error downloading {url}: {e}{Style.RESET_ALL}")
         raise
 
-
 def extract_zip(file_path, dest_dir):
     try:
         print(f"{Fore.YELLOW}Extracting {file_path} to {dest_dir}{Style.RESET_ALL}")
@@ -75,7 +85,6 @@ def extract_zip(file_path, dest_dir):
     except Exception as e:
         print(f"{Fore.RED}Error extracting {file_path}: {e}{Style.RESET_ALL}")
         raise
-
 
 def extract_tar_gz(file_path, dest_dir):
     try:
@@ -86,18 +95,11 @@ def extract_tar_gz(file_path, dest_dir):
         print(f"{Fore.RED}Error extracting {file_path}: {e}{Style.RESET_ALL}")
         raise
 
-
 def main():
     try:
-        # Step 1: Download and extract the launcher AppleScript template app
-        applet_path = os.path.join(temp_dir, "Ghidra-OSX-Launcher-Script.scpt")
-        download_file(applet_url, applet_path)
-
         # Create Ghidra.app as an empty directory first.
-        os.makedirs(app_dir, exist_ok=True)
-        temp_app_name = os.path.join(temp_dir, "Ghidra")
-        subprocess.run(["osacompile", "-o", app_dir, applet_path])
-        # os.rename(temp_app_name, app_dir)
+        subprocess.run(["osacompile", "-o", app_dir, applet_path], check=True)
+        print(f"{Fore.GREEN}Created Ghidra.app at {app_dir}{Style.RESET_ALL}")
 
         # Step 2: Download and extract the latest OpenJDK
         jdk_tar_path = os.path.join(temp_dir, "openjdk.tar.gz")
@@ -108,6 +110,11 @@ def main():
         jdk_final_app_dir = os.path.join(app_dir, "Contents", "Resources", "jdk")
         shutil.copytree(jdk_extracted_dir, jdk_final_app_dir)
 
+    except Exception as e:
+        print(f"{Fore.RED}Installation failed: {e}{Style.RESET_ALL}")
+        exit()
+
+    try:
         # Step 3: Download and extract the latest Ghidra
         ghidra_zip_path = os.path.join(temp_dir, "ghidra.zip")
         download_file(ghidra_url, ghidra_zip_path)
@@ -117,14 +124,15 @@ def main():
         ghidra_final_app_dir = os.path.join(app_dir, "Contents", "Resources", "ghidra")
         shutil.copytree(ghidra_extracted_dir, ghidra_final_app_dir)
 
-        # Step 4: Copy Ghidra.app to the Applications directory
-        print(f"{Fore.GREEN}Copying {app_dir} to {applications_dir}{Style.RESET_ALL}")
-        shutil.copytree(app_dir, os.path.join(applications_dir, "Ghidra.app"), dirs_exist_ok=True)
+        # Step 5: Add execute permissions to the Ghidra launcher script
+        add_execute_permissions(launch_script_path)
+        add_execute_permissions(ghidra_run_path)
 
         print(f"{Fore.GREEN}Ghidra installation completed successfully!{Style.RESET_ALL}")
+
     except Exception as e:
         print(f"{Fore.RED}Installation failed: {e}{Style.RESET_ALL}")
-
+        exit()
 
 if __name__ == "__main__":
     print_banner()
