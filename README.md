@@ -41,6 +41,15 @@ This script automates the process of installing Ghidra as a self-contained OSX `
 
 5. Enjoy. You should have a `Ghidra.app` in your `/Applications`. 
 
+## Release Package
+
+The released packages are built using PyInstaller. To build the package, you need to have PyInstaller installed. 
+They are built for "ease" of installation. Please notice you do need to have Python 3 installed on your system to run the package.
+
+```bash
+pyinstaller --onefile --windowed launcher.py --add-data install_ghidra.py:. --add-data requirements.txt:.
+```
+
 ## Acknowledgements
 
 - Special thanks to [yifanlu](https://gist.github.com/yifanlu/e9965cdb148b550335e57899f790cad2) for providing the AppleScript template used in this script & the inspiration.
