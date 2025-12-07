@@ -4,6 +4,7 @@ import subprocess
 import tarfile
 import urllib.request
 import zipfile
+import requests
 
 from colorama import Fore, Style, init
 from tqdm import tqdm
@@ -32,10 +33,17 @@ def print_banner():
 """
     print(banner)
 
+url = "https://api.github.com/repos/NationalSecurityAgency/ghidra/releases/latest"
+response = requests.get(url)
+data = response.json()
+assets = data["assets"]
+download_url = assets[0]["browser_download_url"]
+
+
 
 # URLs
-java_url = "https://download.java.net/java/GA/jdk22.0.1/c7ec1332f7bb44aeba2eb341ae18aca4/8/GPL/openjdk-22.0.1_macos-aarch64_bin.tar.gz"
-ghidra_url = "https://github.com/NationalSecurityAgency/ghidra/releases/download/Ghidra_11.0.3_build/ghidra_11.0.3_PUBLIC_20240410.zip"
+java_url = "https://download.java.net/java/GA/jdk25/bd75d5f9689641da8e1daabeccb5528b/36/GPL/openjdk-25_macos-aarch64_bin.tar.gz"
+ghidra_url = assets[0]["browser_download_url"]
 
 # Paths
 cwd = os.getcwd()
@@ -71,6 +79,19 @@ class Helper:
                 f"{Fore.RED}Error adding execute permissions to {file_path}: {e}{Style.RESET_ALL}"
             )
             raise
+
+    def add_execute_permissions_app(self, file_path):
+        try:
+            subprocess.run(["chmod", "-R", "775", file_path], check=True)
+            print(
+                f"{Fore.GREEN}Added execute permissions to {file_path}{Style.RESET_ALL}"
+            )   
+        except subprocess.CalledProcessError as e:
+            print(
+                f"{Fore.RED}Error adding execute permissions to {file_path}: {e}{Style.RESET_ALL}"
+            )   
+            raise
+
 
     def download_file(self, url, dest):
         if os.path.exists(dest):
@@ -146,6 +167,11 @@ def main():
         # Step 5: Add execute permissions to the Ghidra launcher script
         helper.add_execute_permissions(launch_script_path)
         helper.add_execute_permissions(ghidra_run_path)
+        helper.add_execute_permissions_app(app_dir)
+
+        
+
+
 
         print(
             f"{Fore.GREEN}Ghidra installation completed successfully!{Style.RESET_ALL}"
@@ -159,3 +185,5 @@ def main():
 if __name__ == "__main__":
     print_banner()
     main()
+
+

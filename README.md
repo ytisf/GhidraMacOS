@@ -20,7 +20,7 @@ settings.
 
 | Feature | Description |
 |---------|-------------|
-| **Self‑contained** | The bundle contains a recent JDK (`openjdk-22.0.1`) and Ghidra (`11.0.3`). |
+| **Self‑contained** | The bundle contains a recent JDK (`openjdk-25`) and the latest version of Ghidra. |
 | **Apple‑Silicon optimized** | Runs natively on M1/M2/M3 devices. |
 | **No system changes** | The JDK lives inside the app, so your system Java is untouched. |
 | **Easy installation** | One command or a pre‑built binary. |
@@ -42,7 +42,7 @@ settings.
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/ytisf/GhidraMacOS
+git clone https://github.com/sh4tteredd/GhidraMacOS
 cd GhidraMacOS
 ```
 
