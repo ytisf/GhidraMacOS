@@ -40,7 +40,7 @@ ghidra_url = "https://github.com/NationalSecurityAgency/ghidra/releases/download
 # Paths
 cwd = os.getcwd()
 temp_dir = os.path.join(cwd, "ghidra_install")
-applet_path = os.path.join(temp_dir, "Ghidra-OSX-Launcher-Script.scpt")
+applet_path = os.path.join(temp_dir, "Ghidra-OSX-Launcher-Script.applescript")
 app_dir = os.path.join(temp_dir, "Ghidra.app")
 jdk_dir = os.path.join(temp_dir, "jdk")
 ghidra_dir = os.path.join(temp_dir, "ghidra")
