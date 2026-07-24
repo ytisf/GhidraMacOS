@@ -53,6 +53,9 @@ launch_script_path = os.path.join(
 ghidra_run_path = os.path.join(
     temp_dir, "Ghidra.app/Contents/Resources/ghidra/ghidraRun"
 )
+pyghidra_run_path = os.path.join(
+    temp_dir, "Ghidra.app/Contents/Resources/ghidra/support/pyghidraRun"
+)
 
 
 # Create temporary directory
@@ -98,7 +101,15 @@ class Helper:
         try:
             print(f"{Fore.YELLOW}Extracting {file_path} to {dest_dir}{Style.RESET_ALL}")
             with zipfile.ZipFile(file_path, "r") as zip_ref:
-                zip_ref.extractall(dest_dir)
+                # zipfile.extractall() does not restore Unix permission bits,
+                # so Ghidra's bundled native binaries (decompiler, demanglers,
+                # etc.) would lose their execute bit. Reapply them from each
+                # entry's external_attr.
+                for info in zip_ref.infolist():
+                    zip_ref.extract(info, dest_dir)
+                    perm = info.external_attr >> 16
+                    if perm:
+                        os.chmod(os.path.join(dest_dir, info.filename), perm)
         except Exception as e:
             print(f"{Fore.RED}Error extracting {file_path}: {e}{Style.RESET_ALL}")
             raise
@@ -143,9 +154,10 @@ def main():
         ghidra_final_app_dir = os.path.join(app_dir, "Contents", "Resources", "ghidra")
         shutil.copytree(ghidra_extracted_dir, ghidra_final_app_dir)
 
-        # Step 5: Add execute permissions to the Ghidra launcher script
+        # Step 5: Add execute permissions to the Ghidra launcher scripts
         helper.add_execute_permissions(launch_script_path)
         helper.add_execute_permissions(ghidra_run_path)
+        helper.add_execute_permissions(pyghidra_run_path)
 
         print(
             f"{Fore.GREEN}Ghidra installation completed successfully!{Style.RESET_ALL}"
