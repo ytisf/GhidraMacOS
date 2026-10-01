@@ -131,6 +131,12 @@ def main():
         subprocess.run(["osacompile", "-o", app_dir, applet_path], check=True)
         print(f"{Fore.GREEN}Created Ghidra.app at {app_dir}{Style.RESET_ALL}")
 
+        # Replace the generic applet icon with the Ghidra icon
+        icon_src = os.path.join(cwd, "icons", "icon.icns")
+        icon_dst = os.path.join(app_dir, "Contents", "Resources", "applet.icns")
+        shutil.copy2(icon_src, icon_dst)
+        print(f"{Fore.GREEN}Set Ghidra icon{Style.RESET_ALL}")
+
         # Step 2: Download and extract the latest OpenJDK
         jdk_tar_path = os.path.join(temp_dir, "openjdk.tar.gz")
         helper.download_file(java_url, jdk_tar_path)
