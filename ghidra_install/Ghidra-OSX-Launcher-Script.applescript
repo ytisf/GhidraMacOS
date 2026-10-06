@@ -1,4 +1,4 @@
-set UnixPath to POSIX path of (path to me as text)
+set UnixPath to POSIX path of (path to me)
 set JdkPath to UnixPath & "Contents/Resources/jdk/Contents/Home/bin"
 set GhidraRun to UnixPath & "Contents/Resources/ghidra/ghidraRun"
 set SupportPath to POSIX path of (path to application support from user domain) & "Ghidra"
