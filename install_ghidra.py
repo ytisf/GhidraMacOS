@@ -135,6 +135,16 @@ def main():
         icon_src = os.path.join(cwd, "icons", "icon.icns")
         icon_dst = os.path.join(app_dir, "Contents", "Resources", "applet.icns")
         shutil.copy2(icon_src, icon_dst)
+        # macOS 26 osacompile sets CFBundleIconName and writes Assets.car, which
+        # the system prefers over applet.icns. Remove both so our icon is used.
+        plist = os.path.join(app_dir, "Contents", "Info.plist")
+        subprocess.run(
+            ["/usr/libexec/PlistBuddy", "-c", "Delete :CFBundleIconName", plist],
+            check=False,
+        )
+        assets_car = os.path.join(app_dir, "Contents", "Resources", "Assets.car")
+        if os.path.exists(assets_car):
+            os.remove(assets_car)
         print(f"{Fore.GREEN}Set Ghidra icon{Style.RESET_ALL}")
 
         # Step 2: Download and extract the latest OpenJDK
